@@ -1,27 +1,20 @@
-FROM debian:stretch-slim
+FROM ubuntu:18.04
 
-# wine via tianon/wine + relevant Python packages
+# wine prereqs
 RUN dpkg --add-architecture i386 \
-	&& apt-get update \
-	&& apt-get install -y --no-install-recommends \
-		wine32 \
-		wine \
-        curl \
-        unzip \
-        ca-certificates \
+    && apt-get update \
+	&& apt-get install -y --no-install-recommends wget gnupg software-properties-common \
+    && wget -nc --no-check-certificate https://dl.winehq.org/wine-builds/winehq.key \
+    && apt-key add winehq.key \
+    && apt-add-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main'
+
+# wine + relevant Python packages
+RUN apt-get install -y --no-install-recommends \
+		winehq-stable \
         python2.7 \
         python3-dev \
         python3-pip \
     && rm -rf /var/lib/apt/lists/*
-
-# via suchja/wine: get latest version of winetricks + mono for wine
-RUN curl -SL 'https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks' -o /usr/local/bin/winetricks \
-		&& chmod +x /usr/local/bin/winetricks
-
-ENV WINE_MONO_VERSION 0.0.8
-RUN mkdir -p /usr/share/wine/mono \
-	&& curl -SL 'http://sourceforge.net/projects/wine/files/Wine%20Mono/$WINE_MONO_VERSION/wine-mono-$WINE_MONO_VERSION.msi/download' -o /usr/share/wine/mono/wine-mono-$WINE_MONO_VERSION.msi \
-	&& chmod +x /usr/share/wine/mono/wine-mono-$WINE_MONO_VERSION.msi
 
 # Install flask dependencies to python3
 RUN pip3 install --upgrade pip
