@@ -11,6 +11,7 @@ RUN dpkg --add-architecture i386 \
 # wine + relevant Python packages
 RUN apt-get install -y --no-install-recommends \
 		winehq-stable \
+        fontconfig \
         python2.7 \
         python3-dev \
         python3-pip \
@@ -24,8 +25,11 @@ RUN pip3 --no-cache-dir install flask
 WORKDIR /
 COPY MSE/ /MSE
 COPY mtgencode/ /mtgencode
-COPY fonts/ .fonts/
+COPY fonts/ usr/share/fonts/
 # COPY app.py /
+
+# Rebuild font cache to see new fonts
+RUN fc-cache -f -v
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
