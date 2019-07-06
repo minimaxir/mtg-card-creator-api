@@ -1,7 +1,7 @@
 # card representation
 import re
 import random
-
+from datetime import datetime
 import utils
 import transforms
 from manalib import Manacost, Manatext
@@ -580,12 +580,16 @@ class Card:
                 if outfield:
                     # specialized field handling for the ones that aren't strings (sigh)
                     if isinstance(outfield, list):
+                        random.seed(datetime.now())
                         outfield_str = ' '.join(outfield)
                     elif isinstance(outfield, Manacost):
+                        random.seed(datetime.now())
                         outfield_str = outfield.encode(randomize = randomize_mana)
                     elif isinstance(outfield, Manatext):
+                        random.seed(datetime.now())
                         outfield_str = outfield.encode(randomize = randomize_mana)
                         if randomize_lines:
+                            random.seed(datetime.now())
                             outfield_str = transforms.randomize_lines(outfield_str)
                     else:
                         outfield_str = outfield
@@ -601,6 +605,7 @@ class Card:
                 raise ValueError('unknown field for Card.encode(): ' + str(field))
 
         if randomize_fields:
+            random.seed(datetime.now())
             random.shuffle(outfields)
         if initial_sep:
             outfields = [''] + outfields

@@ -9,6 +9,7 @@ import random
 import utils
 import jdecode
 import cardlib
+from datetime import datetime
 
 def main(fname, oname = None, verbose = True, encoding = 'std', 
          nolinetrans = False, randomize = False, nolabel = False, stable = False):
@@ -63,7 +64,7 @@ def main(fname, oname = None, verbose = True, encoding = 'std',
     # This should give a random but consistent ordering, to make comparing changes
     # between the output of different versions easier.
     if not stable:
-        random.seed(1371367)
+        random.seed(datetime.now())
         random.shuffle(cards)
 
     def writecards(writer):

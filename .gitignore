@@ -1,2 +1,4 @@
-Magic Set Editor 2/
+MSE/
 *.pyc
+fonts/
+*.txt*
