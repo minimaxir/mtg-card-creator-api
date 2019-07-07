@@ -3,14 +3,14 @@ FROM ubuntu:18.04
 # wine prereqs
 RUN dpkg --add-architecture i386 \
     && apt-get update \
-	&& apt-get install -y --no-install-recommends wget gnupg software-properties-common \
+    && apt-get install -y --no-install-recommends wget gnupg software-properties-common \
     && wget -nc --no-check-certificate https://dl.winehq.org/wine-builds/winehq.key \
     && apt-key add winehq.key \
     && apt-add-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main'
 
 # wine + relevant Python packages
 RUN apt-get install -y --no-install-recommends \
-		winehq-stable \
+        winehq-stable \
         fontconfig \
         python2.7 \
         python3-dev \
@@ -26,7 +26,7 @@ WORKDIR /
 COPY MSE/ /MSE
 COPY mtgencode/ /mtgencode
 COPY fonts/ usr/share/fonts/
-# COPY app.py /
+COPY app.py /
 
 # Rebuild font cache to see new fonts
 RUN fc-cache -f -v
@@ -34,4 +34,4 @@ RUN fc-cache -f -v
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["python3", "app.py"]

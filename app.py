@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 import subprocess
 import base64
 import os
@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
 def homepage():
-    params = request.args
+    params = request.get_json()
     encoded_text = params['text']
 
     # Write encoded text to file so it can be decoded
@@ -19,10 +19,10 @@ def homepage():
     subprocess.call(['python2.7', 'mtgencode/decode.py', '-e',
                      'rfields', '-g', 'encoded.txt', 'card.txt'])
     subprocess.call(['python2.7', 'mtgencode/decode.py', '-e',
-                     'rfields', '-mse', 'encoded.txt', 'MSE/card.mse-set'])
+                     'rfields', '-mse', 'encoded.txt', 'MSE/card'])
 
     # Load decoded Gatherer text
-    with open("encoded.txt", "r") as f:
+    with open("card.txt", "r") as f:
         gatherer_text = f.read().strip()
 
     # Create card image and encode as base64.
@@ -38,11 +38,16 @@ def homepage():
     p.communicate()[0]
     p.stdin.close()
 
-    card_image = base64.b64encode(open("card.jpg", "rb").read())
+    card_image = str(base64.b64encode(open("MSE/card.jpg", "rb").read()))
 
-    return jsonify({'text_format': gatherer_text,
-                    'image': card_image})
+    r = make_response(jsonify({'text_format': gatherer_text,
+                               'image': card_image}))
+
+    r.headers['Access-Control-Allow-Origin'] = '*'
+
+    return r
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)),
+            debug=True)
