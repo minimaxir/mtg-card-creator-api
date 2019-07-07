@@ -38,7 +38,8 @@ def homepage():
     p.communicate()[0]
     p.stdin.close()
 
-    card_image = str(base64.b64encode(open("MSE/card.jpg", "rb").read()))
+    card_image = base64.b64encode(
+        open("MSE/card.jpg", "rb").read()).decode('utf-8')
 
     r = make_response(jsonify({'text_format': gatherer_text,
                                'image': card_image}))
