@@ -26,12 +26,8 @@ def homepage():
         gatherer_text = f.read().strip()
 
     # Create card image and encode as base64.
-    p = subprocess.Popen(['wine',
-                          'mse.exe',
-                          '--cli',
-                          '--raw',
-                          'card.mse-set'],
-                         cwd="MSE",
+    p = subprocess.Popen('wine mse.exe --cli --raw card.mse-set',
+                         cwd="MSE", shell=True,
                          stdout=subprocess.PIPE, stdin=subprocess.PIPE)
 
     p.stdin.write(b'write_image_file(set.cards.0, file: "card.jpg")')
