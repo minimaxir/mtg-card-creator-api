@@ -21,12 +21,20 @@ RUN apt-get install -y --no-install-recommends \
 RUN pip3 install --upgrade pip
 RUN pip3 --no-cache-dir install flask
 
+# Run wine/app as non-root
+RUN useradd -d /home/wine -m -s /bin/bash wine
+ENV HOME /home/wine
+WORKDIR /home/wine
+ENV WINEPREFIX /home/wine/.wine
+ENV WINEARCH win32
+ENV WINEDEBUG -all
+
 # Copy files/folders
-WORKDIR /
-COPY MSE/ /MSE
-COPY mtgencode/ /mtgencode
-COPY fonts/ usr/share/fonts/
-COPY app.py /
+COPY MSE/ /home/wine/MSE
+COPY mtgencode/ /home/wine/mtgencode
+COPY fonts/ .fonts/
+COPY app.py /home/wine/
+RUN chmod a+rwx -R /home/wine/
 
 # Rebuild font cache to see new fonts
 RUN fc-cache -f -v
@@ -34,4 +42,5 @@ RUN fc-cache -f -v
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+USER wine
 ENTRYPOINT ["python3", "app.py"]
