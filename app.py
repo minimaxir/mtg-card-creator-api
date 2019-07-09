@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, make_response
 import subprocess
 import base64
 import os
+import uuid
 
 app = Flask(__name__)
 
@@ -10,6 +11,8 @@ app = Flask(__name__)
 def homepage():
     params = request.get_json()
     encoded_text = params['text']
+    unique_id = uuid.uuid4().hex
+    file_ext = params.get('ext', 'jpg')
 
     # Write encoded text to file so it can be decoded
     with open("encoded.txt", "w") as f:
@@ -30,12 +33,13 @@ def homepage():
                          cwd="MSE", shell=True,
                          stdout=subprocess.PIPE, stdin=subprocess.PIPE)
 
-    p.stdin.write(b'write_image_file(set.cards.0, file: "card.jpg")')
+    p.stdin.write(str.encode('write_image_file(set.cards.0, file: "{}.{}")'.format(unique_id, file_ext)))
     p.communicate()[0]
     p.stdin.close()
 
     card_image = base64.b64encode(
-        open("MSE/card.jpg", "rb").read()).decode('utf-8')
+        open("MSE/{}.{}".format(unique_id, file_ext), "rb").read()).decode('utf-8')
+    os.remove("MSE/{}.{}".format(unique_id, file_ext))
 
     r = make_response(jsonify({'text_format': gatherer_text,
                                'image': card_image}))
