@@ -2,7 +2,7 @@
 
 ![](/card_image_examples/mark_rosewater.jpg)
 
-API to create Magic card images by using [Magic Set Editor](http://magicseteditor.sourceforge.net) and [wine](https://www.winehq.org), enclosed in a Docker container. Input is an encoded card string via mtg-gpt-2-cloud-run, outputs are Gatherer-formated text and a card image.
+API to create Magic card images by using [Magic Set Editor](http://magicseteditor.sourceforge.net) and [wine](https://www.winehq.org), enclosed in a Docker container. Input is an encoded card string via [mtg-gpt-2-cloud-run](https://github.com/minimaxir/mtg-gpt-2-cloud-run), outputs are Gatherer-formated text and a card image.
 
 The API wraps code from Bill Zorn's [mtgencode](https://github.com/billzorn/mtgencode) (MIT, and Python 2 so the container includes a Python 2.7 runtime), and Magic Set Editor to render the cards into JPEGs.
 
