@@ -47,9 +47,12 @@ def homepage():
         subprocess.Popen('wineserver -k', shell=True)
         gen_images = 0
 
-    card_image = base64.b64encode(
-        open("MSE/{}.{}".format(unique_id, file_ext), "rb").read()).decode('utf-8')
-    os.remove("MSE/{}.{}".format(unique_id, file_ext))
+    try:
+        card_image = base64.b64encode(
+            open("MSE/{}.{}".format(unique_id, file_ext), "rb").read()).decode('utf-8')
+        os.remove("MSE/{}.{}".format(unique_id, file_ext))
+    except:
+        card_image = ''
 
     r = make_response(jsonify({'text_format': gatherer_text,
                                'image': card_image}))
