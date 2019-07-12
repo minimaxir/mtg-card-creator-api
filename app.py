@@ -3,6 +3,7 @@ import subprocess
 import base64
 import os
 import uuid
+import logging
 
 app = Flask(__name__)
 
@@ -42,8 +43,9 @@ def homepage():
     # Kill the wineserver periodically to prevent death
     gen_images += 1
     if gen_images == 20:
+        logging.info('Restarting Image Server')
         subprocess.Popen('wineserver -k', shell=True)
-        gen_images == 0
+        gen_images = 0
 
     card_image = base64.b64encode(
         open("MSE/{}.{}".format(unique_id, file_ext), "rb").read()).decode('utf-8')
