@@ -2,3 +2,4 @@ MSE/
 *.pyc
 fonts/
 *.txt*
+.vscode

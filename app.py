@@ -6,9 +6,11 @@ import uuid
 
 app = Flask(__name__)
 
+gen_images = 0
 
 @app.route('/', methods=['POST'])
 def homepage():
+    global gen_images
     params = request.get_json()
     encoded_text = params['text']
     unique_id = uuid.uuid4().hex
@@ -36,6 +38,12 @@ def homepage():
     p.stdin.write(str.encode('write_image_file(set.cards.0, file: "{}.{}")'.format(unique_id, file_ext)))
     p.communicate()[0]
     p.stdin.close()
+
+    # Kill the wineserver periodically to prevent death
+    gen_images += 1
+    if gen_images == 20:
+        subprocess.Popen('wineserver -k', shell=True)
+        gen_images == 0
 
     card_image = base64.b64encode(
         open("MSE/{}.{}".format(unique_id, file_ext), "rb").read()).decode('utf-8')
