@@ -19,7 +19,7 @@ RUN apt-get install -y --no-install-recommends \
 
 # Install flask dependencies to python3
 RUN pip3 install --upgrade pip
-RUN pip3 --no-cache-dir install flask
+RUN pip3 --no-cache-dir install flask pexpect
 
 # Copy files/folders
 WORKDIR /

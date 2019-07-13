@@ -1,18 +1,20 @@
 from flask import Flask, request, jsonify, make_response
 import subprocess
+import pexpect
+import time
 import base64
 import os
 import uuid
 import logging
 
-app = Flask(__name__)
+p = pexpect.spawn('wine mse.exe --cli --raw', cwd="MSE", timeout=60)
+p.expect(".*has been updated.")
 
-gen_images = 0
+app = Flask(__name__)
 
 
 @app.route('/', methods=['POST'])
 def homepage():
-    global gen_images
     params = request.get_json()
     encoded_text = params['text']
     unique_id = uuid.uuid4().hex
@@ -35,21 +37,14 @@ def homepage():
         gatherer_text = f.read().strip()
 
     # Create card image and encode as base64.
-    p = subprocess.Popen('wine mse.exe --cli --raw card.mse-set',
-                         cwd="MSE", shell=True,
-                         stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    p.sendline(':load card.mse-set')
+    p.expect('0')
+    p.sendline(
+        'write_image_file(set.cards.0, file: "{}")'.format(card_file_name))
+    p.expect('0')
 
-    p.stdin.write(str.encode(
-        'write_image_file(set.cards.0, file: "{}")'.format(card_file_name)))
-    p.communicate()[0]
-    p.stdin.close()
-
-    # Kill the wineserver periodically to prevent death
-    gen_images += 1
-    if gen_images == 20:
-        logging.info('Restarting Image Server')
-        subprocess.Popen('wineserver -k', shell=True)
-        gen_images = 0
+    while not os.path.exists("MSE/{}".format(card_file_name)):
+        time.sleep(0.5)
 
     try:
         card_image = base64.b64encode(
