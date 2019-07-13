@@ -9,6 +9,7 @@ app = Flask(__name__)
 
 gen_images = 0
 
+
 @app.route('/', methods=['POST'])
 def homepage():
     global gen_images
@@ -16,6 +17,8 @@ def homepage():
     encoded_text = params['text']
     unique_id = uuid.uuid4().hex
     file_ext = params.get('ext', 'jpg')
+
+    card_file_name = '{}.{}'.format(unique_id, file_ext)
 
     # Write encoded text to file so it can be decoded
     with open("encoded.txt", "w") as f:
@@ -36,7 +39,8 @@ def homepage():
                          cwd="MSE", shell=True,
                          stdout=subprocess.PIPE, stdin=subprocess.PIPE)
 
-    p.stdin.write(str.encode('write_image_file(set.cards.0, file: "{}.{}")'.format(unique_id, file_ext)))
+    p.stdin.write(str.encode(
+        'write_image_file(set.cards.0, file: "{}")'.format(card_file_name)))
     p.communicate()[0]
     p.stdin.close()
 
@@ -49,8 +53,8 @@ def homepage():
 
     try:
         card_image = base64.b64encode(
-            open("MSE/{}.{}".format(unique_id, file_ext), "rb").read()).decode('utf-8')
-        os.remove("MSE/{}.{}".format(unique_id, file_ext))
+            open("MSE/{}".format(card_file_name), "rb").read()).decode('utf-8')
+        os.remove("MSE/{}".format(card_file_name))
     except:
         card_image = ''
 
