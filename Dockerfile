@@ -1,4 +1,6 @@
-FROM ubuntu:18.04
+FROM phusion/baseimage:0.11
+
+CMD ["/sbin/my_init"]
 
 # wine prereqs
 RUN dpkg --add-architecture i386 \
@@ -34,4 +36,4 @@ RUN fc-cache -f -v
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENTRYPOINT ["python3", "app.py"]
+ENTRYPOINT ["/sbin/my_init", "--", "python3", "app.py"]
